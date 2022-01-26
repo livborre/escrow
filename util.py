@@ -112,3 +112,17 @@ def getLastBlockTimestamp(client: AlgodClient) -> Tuple[int, int]:
     timestamp = block["block"]["ts"]
 
     return block, timestamp
+
+def get_client():
+    algod_address = "http://localhost:4001"
+    algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    algod_client = AlgodClient(algod_token, algod_address)
+    return algod_client
+
+def get_account():
+    private_key = "pESL6ROf12JNlue4i6YEUCMhQRTkEvkDJVY5Emgb9TFIplmL0LIxwUUMoso8JL5WvW8MFE7iS6iYpx/Xq1w1SQ=="
+    my_address = "JCTFTC6QWIY4CRIMULFDYJF6K26W6DAUJ3REXKEYU4P5PK24GVETZC676E"
+    return Account(private_key)
+
+def get_appid():
+    return 67039289

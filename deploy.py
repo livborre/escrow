@@ -14,6 +14,9 @@ from util import (
     waitForTransaction,
     fullyCompileContract,
     getAppGlobalState,
+    get_account,
+    get_client,
+    get_appid
 )
 
 APPROVAL_PROGRAM = b""
@@ -81,42 +84,24 @@ def createAuctionApp(
     assert response.applicationIndex is not None and response.applicationIndex > 0
     return response.applicationIndex
 
-def first_transaction(private_key, my_address):
-    algod_address = "http://localhost:4001"
-    algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    algod_client = algod.AlgodClient(algod_token, algod_address)
+def doCreateAuctionApp(sender: Account):
+    algod_client = get_client()
+    account_info = algod_client.account_info(sender.getAddress())
 
-    print("My address: {}".format(my_address))
-    account_info = algod_client.account_info(my_address)
+    print("My address: {}".format(sender.getAddress()))
     print("Account balance: {} microAlgos".format(account_info.get('amount')))
-
-    sender = Account(private_key)
 
     application_id = createAuctionApp(algod_client, sender)
 
     print(f"Application ID: {application_id}")
 
-    print("Account balance: {} microAlgos".format(account_info.get('amount')))
+def printState():
+    state = getAppGlobalState(get_client(), get_appid())
+    print(state)
 
-    
-private_key = "pESL6ROf12JNlue4i6YEUCMhQRTkEvkDJVY5Emgb9TFIplmL0LIxwUUMoso8JL5WvW8MFE7iS6iYpx/Xq1w1SQ=="
-my_address = "JCTFTC6QWIY4CRIMULFDYJF6K26W6DAUJ3REXKEYU4P5PK24GVETZC676E"
-
-# first_transaction(private_key, my_address)
-def query_contract():
-    algod_address = "http://localhost:4001"
-    algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    algod_client = algod.AlgodClient(algod_token, algod_address)
-
-    info = algod_client.application_info(67039289)
-
-    print(json.dumps(info, indent=4))
-
-    print(base64.b64decode(
-        info["params"]["global-state"][0]["value"]["bytes"]
-    ))
-
-query_contract()
+# doCreateAuctionApp(get_account())
+# query_contract()
+# printState()
 
 
 
