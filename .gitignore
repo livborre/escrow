@@ -1,5 +1,4 @@
 .vscode/*
-!.vscode/settings.json
 escrowvenv/
 escrow_venv/
 __pycache__/
