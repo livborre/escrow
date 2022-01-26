@@ -4,7 +4,7 @@ from urllib import response
 
 from algosdk.v2client.algod import AlgodClient
 from algosdk.future import transaction
-from algosdk.logic import get_application_address
+
 from algosdk import account, encoding
 from algosdk.v2client import algod
 from account import Account
@@ -40,25 +40,8 @@ def callChange(
             of 1, while others are fractional NFTs with a greater total supply,
             so use a value that makes sense for the NFT being auctioned.
     """
-    appAddr = get_application_address(appID)
 
     suggestedParams = client.suggested_params()
-
-    fundingAmount = (
-        # min account balance
-        100_000
-        # additional min balance to opt into NFT
-        + 100_000
-        # 3 * min txn fee
-        + 3 * 1_000
-    )
-
-    fundAppTxn = transaction.PaymentTxn(
-        sender=sender.getAddress(),
-        receiver=appAddr,
-        amt=fundingAmount,
-        sp=suggestedParams,
-    )
 
     changeNameTxn = transaction.ApplicationCallTxn(
         sender=sender.getAddress(),
@@ -68,15 +51,10 @@ def callChange(
         sp=suggestedParams,
     )
 
-    transaction.assign_group_id([fundAppTxn, changeNameTxn])
-
-    signedFundAppTxn = fundAppTxn.sign(sender.getPrivateKey())
     signedSetupTxn = changeNameTxn.sign(sender.getPrivateKey())
+    client.send_transaction(signedSetupTxn)
 
-
-    client.send_transactions([signedFundAppTxn, signedSetupTxn])
-
-    response = waitForTransaction(client, signedFundAppTxn.get_txid())
+    response = waitForTransaction(client, signedSetupTxn.get_txid())
     return response
 
 

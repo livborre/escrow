@@ -1,7 +1,9 @@
+import json
 from typing import Tuple, List
 
 from algosdk.v2client.algod import AlgodClient
 from algosdk.future import transaction
+from algosdk.logic import get_application_address
 
 from account import Account
 from contract import approval_program, clear_state_program
@@ -79,7 +81,33 @@ def createAuctionApp(
     assert response.applicationIndex is not None and response.applicationIndex > 0
     return response.applicationIndex
 
-def doCreateAuctionApp(sender: Account):
+def fund_escrow(client: AlgodClient, funder: Account, appID: int):
+    suggestedParams = client.suggested_params()
+    appAddr = get_application_address(appID)
+
+    fundingAmount = (
+        # min account balance
+        100_000
+        # additional min balance to opt into NFT
+        + 100_000
+        # 3 * min txn fee
+        + 3 * 1_000
+    )
+
+    fundAppTxn = transaction.PaymentTxn(
+        sender=funder.getAddress(),
+        receiver=appAddr,
+        amt=fundingAmount,
+        sp=suggestedParams,
+    )
+
+    signedFundTxn = fundAppTxn.sign(funder.getPrivateKey())
+    client.send_transaction(signedFundTxn)
+
+    response = waitForTransaction(client, signedFundTxn.get_txid())
+    return response
+
+def create_and_fund(sender: Account):
     algod_client = get_client()
     account_info = algod_client.account_info(sender.getAddress())
 
@@ -87,15 +115,18 @@ def doCreateAuctionApp(sender: Account):
     print("Account balance: {} microAlgos".format(account_info.get('amount')))
 
     application_id = createAuctionApp(algod_client, sender)
-
     print(f"Application ID: {application_id}")
 
-def printState():
-    state = getAppGlobalState(get_client(), get_appid())
-    print(state)
+    print("Funding Escrow Contract...")
+    response = fund_escrow(algod_client, sender, application_id)
 
-# doCreateAuctionApp(get_account())
-# printState()
+    appAddr = get_application_address(application_id)
+    app_info = algod_client.account_info(appAddr)
+    
+    print("App balance: {} microAlgos".format(app_info.get('amount')))
+
+create_and_fund(get_account())
+
 
 
 

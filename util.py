@@ -126,3 +126,7 @@ def get_account():
 
 def get_appid():
     return 67039289
+
+def printState():
+    state = getAppGlobalState(get_client(), get_appid())
+    print(state)
