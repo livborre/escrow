@@ -1,5 +1,3 @@
-from algosdk.v2client import algod
-from account import Account
 from algosdk.future.transaction import AssetConfigTxn, wait_for_confirmation
 from util import (
    get_account, 

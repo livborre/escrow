@@ -2,11 +2,6 @@ from typing import Tuple, List
 
 from algosdk.v2client.algod import AlgodClient
 from algosdk.future import transaction
-from algosdk.logic import get_application_address
-from algosdk import account, encoding
-from algosdk.v2client import algod
-import json
-import base64
 
 from account import Account
 from contract import approval_program, clear_state_program
@@ -100,7 +95,6 @@ def printState():
     print(state)
 
 # doCreateAuctionApp(get_account())
-# query_contract()
 # printState()
 
 
