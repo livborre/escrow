@@ -1,14 +1,14 @@
 from algosdk.v2client import algod
 from account import Account
 from algosdk.future.transaction import AssetConfigTxn, wait_for_confirmation
-from algosdk.v2client import indexer
+from util import (
+   get_account, 
+   get_client,
+)
 
-def create_NFT(private_key, my_address):
-    algod_address = "http://localhost:4001"
-    algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    algod_client = algod.AlgodClient(algod_token, algod_address)
-
-    sender = Account(private_key)
+def create_NFT(sender):
+    algod_client = get_client()
+    my_address = sender.getAddress()
 
     txn = AssetConfigTxn(sender=my_address,
                         sp=algod_client.suggested_params(),
@@ -42,8 +42,5 @@ def create_NFT(private_key, my_address):
     except Exception as e:
         print(e)
 
-private_key = "pESL6ROf12JNlue4i6YEUCMhQRTkEvkDJVY5Emgb9TFIplmL0LIxwUUMoso8JL5WvW8MFE7iS6iYpx/Xq1w1SQ=="
-my_address = "JCTFTC6QWIY4CRIMULFDYJF6K26W6DAUJ3REXKEYU4P5PK24GVETZC676E"
-
-application_id = create_NFT(private_key, my_address)
+application_id = create_NFT(get_account())
 print(f"application_id: {application_id}")
