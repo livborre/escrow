@@ -175,7 +175,7 @@ def opt_in_contract_and_deposit_NFT(
 
     # wait for NFT to be deposited in contract.
     waitForTransaction(client, signed_deposit_NFT_txn.get_txid())
-    print(f"NFT (NFT ID: {NFT_ID}) deposited in contract with app ID: {application_ID} and application address: {application_address}")
+    print(f"NFT with ID: {NFT_ID} deposited in contract with application address: {application_address}")
 
 def create_and_fund(creator: Account):
     """ Utility function to create an escrow contract and fund it. Note that here the creator and the funder is the same address. Prints all relevant information before and after creation and funding.
@@ -196,7 +196,7 @@ def create_and_fund(creator: Account):
 
     print("Creating Escrow Contract...")
     application_id = create_escrow_contract(algod_client, creator)
-    print(f"Contract deployed to Application ID: {application_id}")
+    # print(f"Contract deployed to Application ID: {application_id}")
 
     print("Funding Escrow Contract...")
     fund_escrow_contract(algod_client, creator, application_id)
@@ -208,7 +208,7 @@ def create_and_fund(creator: Account):
     application_balance = application_info.get('amount')
 
     print(f"Escrow balance: {application_balance} microAlgos")
-    print(f"Creator balance: {creator_balance} microAlgos")
+    # print(f"Creator balance: {creator_balance} microAlgos")
 
     return application_id, application_address, 
 
@@ -252,7 +252,7 @@ def pay_and_call_on_buy(client: AlgodClient, application_ID: int, buyer: Account
 
     signed_opt_buyer_txn = opt_in_buyer_txn.sign(buyer.getPrivateKey())
     opt_buyer_txn_id = client.send_transaction(signed_opt_buyer_txn)
-    print(f"Opting in buyer transaction ID: {opt_buyer_txn_id}")
+    # print(f"Opting in buyer transaction ID: {opt_buyer_txn_id}")
     waitForTransaction(client, opt_buyer_txn_id)
 
     app_args = [
@@ -283,6 +283,10 @@ def pay_and_call_on_buy(client: AlgodClient, application_ID: int, buyer: Account
 
     # wait for the call transaction to complete.
     waitForTransaction(client, signed_call_txn.get_txid())
+    signed_pay_txn_id = signed_pay_txn.get_txid()
+    print(f"Payment transaction ID from buyer to Escrow Contract: {signed_pay_txn_id}")
+    print("\n")
+    print("https://testnet.algoexplorer.io/tx/" + f"{signed_pay_txn_id}")
 
 def buy_and_transfer_NFT(application_ID: int, buyer: Account):
     """ Carry out buy_and_call_on_buy function with relevant information printed to buy the NFT from the buyer account, and move the NFT from the contract to the buyer.
@@ -300,22 +304,29 @@ def buy_and_transfer_NFT(application_ID: int, buyer: Account):
     application_global_state = getAppGlobalState(algod_client, application_ID)
     NFT_ID = application_global_state[b"nft_id"]
     application_address = get_application_address(application_ID)
-    print(f"Application id: {application_ID}")
-    print(f"Application address: {application_address}")
-    print(f"NFT ID: {NFT_ID}")
+    # print(f"Application id: {application_ID}")
+    # print(f"Application address: {application_address}")
+    print(f"NFT to transfer: {NFT_ID}")
 
-    pretty_buyer_info = json.dumps(buyer_info, indent=4)
+    # pretty_buyer_info = json.dumps(buyer_info, indent=4)
     print(f"Buyer address: {buyer.getAddress()}")
     print(f"Buyer balance: {buyer_balance} microAlgos.")
-    print(f"Buyer info before buying: {pretty_buyer_info}")
+    # print(f"Buyer info before buying: {pretty_buyer_info}")
 
-    print("Buying nft...")
+    print("Depositing 1 Algo into Escrow Contract...")
     pay_and_call_on_buy(algod_client, application_ID, buyer)
+    print(f"Matched 1 Algo with NFT ID: {NFT_ID}...")
 
-    buyer_info = algod_client.account_info(buyer.getAddress())
-    pretty_buyer_info = json.dumps(buyer_info, indent=4)
-    print(f"Buyer info after buying: {pretty_buyer_info}")
+    input("\n" + "...")
+ 
+    print(f"Transfer NFT ID: {NFT_ID} to buyer")
+    print("\n")
+    print("https://testnet.algoexplorer.io/address/" + f"{buyer.getAddress()}")
+    print("Transfer 1 Algo from Escrow Contract to seller")
 
+    # buyer_info = algod_client.account_info(buyer.getAddress())
+    # pretty_buyer_info = json.dumps(buyer_info, indent=4)
+    # print(f"Buyer info after buying: {pretty_buyer_info}")
 
 # get account details.
 client = get_client()
@@ -325,16 +336,30 @@ buyer = get_buyer()
 
 # create and fund contract from creator account.
 application_ID, application_address = create_and_fund(creator) 
-print(f"Contract deployed at Application ID: {application_ID} and Application Address: {application_address}")
+print(f"Contract deployed at address: {application_address}")
+print("\n")
+print("https://testnet.algoexplorer.io/address/" + f"{application_address}") 
+
+input("\n" + "...")
 
 # create the NFT in the seller account.
+print("Creating NFT in seller account...")
 NFT_ID = create_NFT(seller)
-print(f"NFT deployed at NFT ID: {NFT_ID} stored at seller address: {seller.getAddress()}")
+print(f"NFT ID: {NFT_ID} stored at seller address: {seller.getAddress()}")
+print("\n")
+print("https://testnet.algoexplorer.io/address/" + f"{seller.getAddress()}") 
+
+input("\n" + "...")
 
 # opt in and deposit NFT from seller to contract.
+print("Seller depositing NFT into Escrow Account...")
 opt_in_contract_and_deposit_NFT(client, seller, application_ID, NFT_ID)
+print("\n")
+print("https://testnet.algoexplorer.io/address/" + f"{application_address}")
+
+input("\n" + "...")
 
 # now send a buy transaction from buyer to contract and transfer NFT from contract to buyer.
 buy_and_transfer_NFT(application_ID, buyer)
 
-# THE NFT SEEMS TO BE WANTING TO BE TRANSFERRED FROM THE BUYER ACCOUNT, NOT FROM THE CONTRACT.
+print("All done! Escrow contract ready to accept another NFT or Algos.")

@@ -3,6 +3,16 @@ from base64 import b64decode
 from algosdk.v2client.algod import AlgodClient
 from algosdk import mnemonic
 from pyteal import compileTeal, Mode, Expr
+import os
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+
+
+
 
 from account import Account
 
@@ -117,22 +127,31 @@ def get_client():
     algod_client = AlgodClient(algod_token, algod_address)
     return algod_client
 
+
+creator_pk = os.environ.get("CREATOR_PK")
+buyer_pk = os.environ.get("BUYER_PK")
+seller_pk = os.environ.get("SELLER_PK")
+
+creator_address = os.environ.get("CREATOR_ADDRESS")
+buyer_address = os.environ.get("BUYER_ADDRESS")
+seller_address = os.environ.get("SELLER_ADDRESS")
+
 def get_creator():
-    private_key = "KYKf2DrRMcKutz49aX66brG0m6ZE8i8RIjJoYqAwgsNB0AyhwqdD0i7Ml4rGE/NfQGBWJYbNTqv0RJooMCFokw=="
-    my_address = "IHIAZIOCU5B5ELWMS6FMME7TL5AGAVRFQ3GU5K7UISNCQMBBNCJ752VLIY"
-    # nest capital upper century peace later basket jelly choice tuna hamster letter giggle quarter bring release crunch later month rather lyrics lottery gap abstract drea
+    private_key = creator_pk
+    my_address = creator_address
+    # bullet cigar couple same panther ugly drill fold talk shrug sunset come love crystal evoke there hollow setup swift olympic similar trigger floor absorb argue
     return Account(private_key)
 
 def get_seller():
-    private_key = "DIWbuHIYfprqtaUD6cQkcx3Zmsj6vq557yrUtXTzbGV1K+sZe+guHeNKDvFBo1DZjGC7cKmRg3rUuooETBVqpw=="
-    my_address = "OUV6WGL35AXB3Y2KB3YUDI2Q3GGGBO3QVGIYG6WUXKFAITAVNKT7UIQYQI"
-    # pave host fox mango wire pledge quantum pizza call beauty mystery strong rate chase stone same cupboard sadness betray front truly devote clock about vapor
+    private_key = seller_pk
+    my_address = seller_address
+    # goose ketchup mistake void drill drastic cat pact impose swamp later pigeon gift load frozen dry enroll vague seed clinic caution nice soap abstract wire
     return Account(private_key)
 
 def get_buyer():
-    private_key = "ES5wU2wzX2W0ezQLr2mjGIM7z8QHrjz43qxyZr8HeW/IMIl+5zZ3uvtSMobJRVmGWzaPIRdehBFuaIr+WdPH7A=="
-    my_address = "ZAYIS7XHGZ33V62SGKDMSRKZQZNTNDZBC5PIIELONCFP4WOTY7WMOMHFUM"
-    # season scheme claim cycle salmon bone tank crucial thumb pluck faculty cover jacket critic dilemma puppy always know filter grunt learn draft knock about shoot
+    private_key = buyer_pk
+    my_address = buyer_address
+    # neither surface artefact garage clutch catch kiss bacon job spread border blade later meat sound muffin hello moral razor endorse alter just sustain able shadow
     return Account(private_key)
 
 def get_nftid():

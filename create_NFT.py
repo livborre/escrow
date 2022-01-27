@@ -38,7 +38,7 @@ def create_NFT(seller: Account):
     try:
         pending_txn= algod_client.pending_transaction_info(NFT_creation_txn)
         NFT_ID = pending_txn["asset-index"]
-        print(f"NFT ID: {NFT_ID}")
+        # print(f"NFT ID: {NFT_ID}")
     except Exception as e:
         print(e)
 
