@@ -2,7 +2,8 @@ from typing import List, Tuple, Dict, Any, Optional, Union
 from base64 import b64decode
 
 from algosdk.v2client.algod import AlgodClient
-from algosdk import encoding
+from algosdk import encoding, account, mnemonic
+
 
 from pyteal import compileTeal, Mode, Expr
 
@@ -120,12 +121,26 @@ def get_client():
     return algod_client
 
 def get_account():
-    private_key = "pESL6ROf12JNlue4i6YEUCMhQRTkEvkDJVY5Emgb9TFIplmL0LIxwUUMoso8JL5WvW8MFE7iS6iYpx/Xq1w1SQ=="
-    my_address = "JCTFTC6QWIY4CRIMULFDYJF6K26W6DAUJ3REXKEYU4P5PK24GVETZC676E"
+    private_key = "PA7noOkPcTVZfLNFx2AD8NAWaYxYCz41HQj4oPBzjQFM6bNqW/a4oVDJxIE0YgN791Su8afMvZ3CyoMnQ71iRg=="
+    my_address = "JTU3G2S3624KCUGJYSATIYQDPP3VJLXRU7GL3HOCZKBSOQ55MJDFPVPSGM"
+    # shy order spare write tilt essence tissue recall trim loan accuse audit color bottom settle area pond inquiry advice auto throw friend arrest abandon empty
+    return Account(private_key)
+
+def get_seller():
+    private_key = "DIWbuHIYfprqtaUD6cQkcx3Zmsj6vq557yrUtXTzbGV1K+sZe+guHeNKDvFBo1DZjGC7cKmRg3rUuooETBVqpw=="
+    my_address = "OUV6WGL35AXB3Y2KB3YUDI2Q3GGGBO3QVGIYG6WUXKFAITAVNKT7UIQYQI"
+    return Account(private_key)
+
+def get_buyer():
+    private_key = "ES5wU2wzX2W0ezQLr2mjGIM7z8QHrjz43qxyZr8HeW/IMIl+5zZ3uvtSMobJRVmGWzaPIRdehBFuaIr+WdPH7A=="
+    my_address = "ZAYIS7XHGZ33V62SGKDMSRKZQZNTNDZBC5PIIELONCFP4WOTY7WMOMHFUM"
     return Account(private_key)
 
 def get_appid():
     return 67039289
+
+def get_nftid():
+    return 67140032
 
 def printState():
     state = getAppGlobalState(get_client(), get_appid())

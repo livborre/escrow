@@ -100,7 +100,7 @@ def approval_program():
 
     on_bid_txn_index = Txn.group_index() - Int(1)
     on_bid_nft_holding = AssetHolding.balance(
-        Global.current_application_address(), App.globalGet(nft_id_key)
+        Global.current_application_address(), App.globalGet(nft_id_key))
     
     on_bid = Seq(
         on_bid_nft_holding,

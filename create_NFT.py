@@ -2,6 +2,7 @@ from algosdk.future.transaction import AssetConfigTxn, wait_for_confirmation
 from util import (
    get_account, 
    get_client,
+   get_seller,
 )
 
 def create_NFT(sender):
@@ -35,10 +36,9 @@ def create_NFT(sender):
         ptx = algod_client.pending_transaction_info(txid)
         asset_id = ptx["asset-index"]
         print(f"asset_id: {asset_id}")
-        asset = account_info["created-assets"][0]
-        print(f"something interesting: {asset}")
+        # asset = account_info["created-assets"][0]
+        # print(f"created asset: {asset}")
     except Exception as e:
         print(e)
 
-application_id = create_NFT(get_account())
-print(f"application_id: {application_id}")
+create_NFT(get_seller())
