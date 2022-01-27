@@ -20,8 +20,7 @@ from util import (
     fullyCompileContract,
     getAppGlobalState,
     get_account,
-    get_client,
-    get_appid
+    get_client
 )
 
 APPROVAL_PROGRAM = b""
@@ -66,15 +65,6 @@ def create_auctionApp(
     globalSchema = transaction.StateSchema(num_uints=3, num_byte_slices=1)
     localSchema = transaction.StateSchema(num_uints=0, num_byte_slices=0)
 
-    price = 1_000_000  # 1 Algo
-    nftID = get_nftid()
-
-    app_args = [
-        encoding.decode_address(get_seller().getAddress()),
-        nftID.to_bytes(8, "big"),
-        price.to_bytes(8, "big")
-    ]
-
     txn = transaction.ApplicationCreateTxn(
         sender=sender.getAddress(),
         on_complete=transaction.OnComplete.NoOpOC,
@@ -82,7 +72,6 @@ def create_auctionApp(
         clear_program=clear,
         global_schema=globalSchema,
         local_schema=localSchema,
-        app_args=app_args,
         sp=client.suggested_params(),
     )
 
@@ -136,22 +125,43 @@ def setup_app(
         The ID of the newly created auction app.
     """
 
+    appAddr = get_application_address(appID)
+
     suggestedParams = client.suggested_params()
+
+    price = 1_000_000  # 1 Algo
+    app_args = [
+        b"setup",
+        encoding.decode_address(get_seller().getAddress()),
+        nftID.to_bytes(8, "big"),
+        price.to_bytes(8, "big")
+    ]
 
     setupContractTxn = transaction.ApplicationCallTxn(
         sender=sender.getAddress(),
         index=appID,
         on_complete=transaction.OnComplete.NoOpOC,
-        app_args=[b"setup"],
+        app_args=app_args,
         foreign_assets=[nftID],
         sp=suggestedParams,
     )
 
-    signedTxn = setupContractTxn.sign(sender.getPrivateKey())
+    fundNftTxn = transaction.AssetTransferTxn(
+        sender=sender.getAddress(),
+        receiver=appAddr,
+        index=nftID,
+        amt=1,
+        sp=suggestedParams,
+    )
 
-    client.send_transaction(signedTxn)
+    transaction.assign_group_id([setupContractTxn, fundNftTxn])
 
-    response = waitForTransaction(client, signedTxn.get_txid())
+    signedSetupTxn = setupContractTxn.sign(sender.getPrivateKey())
+    signedFundNftTxn = fundNftTxn.sign(sender.getPrivateKey())
+
+    client.send_transactions([signedSetupTxn, signedFundNftTxn])
+
+    response = waitForTransaction(client, signedFundNftTxn.get_txid())
     print(f"Done")
 
 def create_and_fund(creator: Account, seller: Account):
@@ -175,9 +185,6 @@ def create_and_fund(creator: Account, seller: Account):
     print("Escrow balance: {} microAlgos".format(app_info.get('amount')))
     print("Creator balance: {} microAlgos".format(creator_info_after.get('amount')))
 
-    print("Opt in Escrow Contract to receive nft...")
-    setup_app(algod_client, seller, application_id, get_nftid())
-
 def buy_nft(client: AlgodClient, appID: int, buyer: Account) -> None:
     """Place a bid on an active auction.
 
@@ -189,14 +196,13 @@ def buy_nft(client: AlgodClient, appID: int, buyer: Account) -> None:
     """
     appAddr = get_application_address(appID)
     appGlobalState = getAppGlobalState(client, appID)
-
     nftID = appGlobalState[b"nft_id"]
 
     if any(appGlobalState[b"seller"]):
         # if "bid_account" is not the zero address
-        seller = encoding.encode_address(appGlobalState[b"seller"])
+        seller_address = encoding.encode_address(appGlobalState[b"seller"])
     else:
-        seller = None
+        seller_address = None
 
     suggestedParams = client.suggested_params()
 
@@ -208,6 +214,7 @@ def buy_nft(client: AlgodClient, appID: int, buyer: Account) -> None:
         sp=suggestedParams,
     )
 
+    seller = get_seller()
     appCallTxn = transaction.ApplicationCallTxn(
         sender=buyer.getAddress(),
         index=appID,
@@ -215,7 +222,7 @@ def buy_nft(client: AlgodClient, appID: int, buyer: Account) -> None:
         app_args=[b"buy"],
         foreign_assets=[nftID],
         # must include the previous lead bidder here to the app can refund that bidder's payment
-        accounts=[seller],
+        accounts=[seller_address],
         sp=suggestedParams,
     )
 
@@ -253,5 +260,9 @@ def do_buy_nft(application_id: int, buyer: Account):
     buyer_info_after = algod_client.account_info(buyer.getAddress())
     print("Buyer info: {}".format(json.dumps(buyer_info_after)))
 
-# create_and_fund(get_account(), get_seller())
-do_buy_nft(67216795, get_buyer())
+# app_id = create_and_fund(get_account(), get_seller())
+
+# print("Opt in Escrow Contract to receive nft...")
+# setup_app(get_client(), get_seller(), 67250638, get_nftid())
+
+do_buy_nft(67249607, get_buyer())

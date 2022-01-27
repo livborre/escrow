@@ -113,15 +113,18 @@ def approval_program():
         )
     # end_time = Btoi(Txn.application_args[3])
     on_create = Seq(
-        App.globalPut(seller_address_key, Txn.application_args[0]),
-        App.globalPut(nft_id_key, Btoi(Txn.application_args[1])),
-        App.globalPut(min_price_key, Btoi(Txn.application_args[2])),
+        # App.globalPut(seller_address_key, Txn.application_args[0]),
+        # App.globalPut(nft_id_key, Btoi(Txn.application_args[1])),
+        # App.globalPut(min_price_key, Btoi(Txn.application_args[2])),
         # App.globalPut(end_time_key, end_time),
         # Assert(Global.latest_timestamp() < end_time),
         Approve(),
     )
 
     on_setup = Seq(
+        App.globalPut(seller_address_key, Txn.application_args[1]),
+        App.globalPut(nft_id_key, Btoi(Txn.application_args[2])),
+        App.globalPut(min_price_key, Btoi(Txn.application_args[3])),
         # Assert(Global.creator_address() == Txn.sender),
         # Assert(Global.latest_timestamp() < App.globalGet(start_time_key)),
         # opt into NFT asset -- because you can't opt in if you're already opted in, this is what
@@ -138,42 +141,56 @@ def approval_program():
         Approve(),
     )
 
-    on_buy_txn_index = Txn.group_index() - Int(1)
+    # on_buy_txn_index = Txn.group_index() - Int(1)
     on_buy = Seq(
-        # assert the asset has been set up
-        # assert_asset_balance(App.globalGet(nft_id_key)),
-        Assert(
-            And(
-                # the auction has not ended
-                # Global.latest_timestamp() < App.globalGet(end_time_key),
-                # the actual bid payment is before the app call
-                Gtxn[on_buy_txn_index].type_enum() == TxnType.Payment,
-                Gtxn[on_buy_txn_index].sender() == Txn.sender(),
-                Gtxn[on_buy_txn_index].receiver() == Global.current_application_address(),
-                Gtxn[on_buy_txn_index].amount() >= Global.min_txn_fee(),
-            )
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields(
+            {
+                TxnField.type_enum: TxnType.AssetTransfer,
+                TxnField.xfer_asset: App.globalGet(nft_id_key),
+                TxnField.asset_close_to: Txn.sender(),
+                # TxnField.amount: Int(1),
+            }
         ),
-        If(
-            Gtxn[on_buy_txn_index].amount() >= App.globalGet(min_price_key)
-        ).Then(
-            Seq(
-                close_nft_to(App.globalGet(nft_id_key), Gtxn[on_buy_txn_index].sender()),
-
-                # Send money to seller
-                # InnerTxnBuilder.Begin(),
-                # InnerTxnBuilder.SetFields(
-                #     {
-                #         TxnField.type_enum: TxnType.Payment,
-                #         TxnField.amount: Gtxn[on_buy_txn_index].amount() - Global.min_txn_fee(),
-                #         TxnField.receiver: App.globalGet(seller_address_key),
-                #     }
-                # ),
-                # InnerTxnBuilder.Submit(),
-                Approve(),
-            )
-        ),
-        Reject(),
+        InnerTxnBuilder.Submit(),
+        Approve(),
     )
+
+    # on_buy_complex = Seq(
+    #     # assert the asset has been set up
+    #     # assert_asset_balance(App.globalGet(nft_id_key)),
+    #     Assert(
+    #         And(
+    #             # the auction has not ended
+    #             # Global.latest_timestamp() < App.globalGet(end_time_key),
+    #             # the actual bid payment is before the app call
+    #             Gtxn[on_buy_txn_index].type_enum() == TxnType.Payment,
+    #             Gtxn[on_buy_txn_index].sender() == Txn.sender(),
+    #             Gtxn[on_buy_txn_index].receiver() == Global.current_application_address(),
+    #             Gtxn[on_buy_txn_index].amount() >= Global.min_txn_fee(),
+    #         )
+    #     ),
+    #     If(
+    #         Gtxn[on_buy_txn_index].amount() >= App.globalGet(min_price_key)
+    #     ).Then(
+    #         Seq(
+    #             close_nft_to(App.globalGet(nft_id_key), Gtxn[on_buy_txn_index].sender()),
+
+    #             # Send money to seller
+    #             # InnerTxnBuilder.Begin(),
+    #             # InnerTxnBuilder.SetFields(
+    #             #     {
+    #             #         TxnField.type_enum: TxnType.Payment,
+    #             #         TxnField.amount: Gtxn[on_buy_txn_index].amount() - Global.min_txn_fee(),
+    #             #         TxnField.receiver: App.globalGet(seller_address_key),
+    #             #     }
+    #             # ),
+    #             # InnerTxnBuilder.Submit(),
+    #             Approve(),
+    #         )
+    #     ),
+    #     Reject(),
+    # )
 
     on_delete = Seq(
         # the auction has not yet started, it's ok to delete

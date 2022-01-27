@@ -121,9 +121,9 @@ def get_client():
     return algod_client
 
 def get_account():
-    private_key = "PA7noOkPcTVZfLNFx2AD8NAWaYxYCz41HQj4oPBzjQFM6bNqW/a4oVDJxIE0YgN791Su8afMvZ3CyoMnQ71iRg=="
-    my_address = "JTU3G2S3624KCUGJYSATIYQDPP3VJLXRU7GL3HOCZKBSOQ55MJDFPVPSGM"
-    # shy order spare write tilt essence tissue recall trim loan accuse audit color bottom settle area pond inquiry advice auto throw friend arrest abandon empty
+    private_key = "cBFLfo2zholU0RRWeyNsnmlCnTV93lQNmJV34QSWURTojVVh6LXTXW68eAU3TYd4qfMLvzHZOkieiDbcoB0eGQ=="
+    my_address = "5CGVKYPIWXJV23V4PACTOTMHPCU7GC57GHMTUSE6RA3NZIA5DYMWAMNTM4"
+    # come clump sand decide aspect carbon melt below hello mistake current okay luggage guard trust taxi pride gasp skull blast antenna grain penalty abandon script
     return Account(private_key)
 
 def get_seller():
@@ -136,12 +136,9 @@ def get_buyer():
     my_address = "ZAYIS7XHGZ33V62SGKDMSRKZQZNTNDZBC5PIIELONCFP4WOTY7WMOMHFUM"
     return Account(private_key)
 
-def get_appid():
-    return 67039289
-
 def get_nftid():
-    return 67140032
+    return 67248837
 
-def printState():
-    state = getAppGlobalState(get_client(), get_appid())
+def printState(appID: int):
+    state = getAppGlobalState(get_client(), appID)
     print(state)
