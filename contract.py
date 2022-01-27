@@ -5,7 +5,7 @@ def approval_program():
     seller_address_key = Bytes("seller")
     buyer_address_key = Bytes("buyer")
     nft_id_key = Bytes("nft_id")
-    min_price_key = Bytes("min_price")
+    price_key = Bytes("price")
 
     @Subroutine(TealType.none)
     def close_nft_to(assetID: Expr, account: Expr) -> Expr:
@@ -51,7 +51,7 @@ def approval_program():
     on_setup = Seq(
         App.globalPut(seller_address_key, Txn.application_args[1]),
         App.globalPut(nft_id_key, Btoi(Txn.application_args[2])),
-        App.globalPut(min_price_key, Btoi(Txn.application_args[3])),
+        App.globalPut(price_key, Btoi(Txn.application_args[3])),
         # Assert(Global.creator_address() == Txn.sender),
         # Assert(Global.latest_timestamp() < App.globalGet(start_time_key)),
         InnerTxnBuilder.Begin(),
@@ -69,31 +69,23 @@ def approval_program():
     on_buy = Seq(
         App.globalPut(buyer_address_key, Txn.application_args[1]),
         # Assert(Global.creator_address() == Txn.sender),
-        InnerTxnBuilder.Begin(),
-        InnerTxnBuilder.SetFields(
-            {
-                TxnField.type_enum: TxnType.AssetTransfer,
-                TxnField.xfer_asset: App.globalGet(nft_id_key),
-                TxnField.asset_receiver: Txn.sender(),
-            }
+        close_nft_to(
+            App.globalGet(nft_id_key),
+            App.globalGet(buyer_address_key)
         ),
-        InnerTxnBuilder.Submit(),
         Approve(),
+        # InnerTxnBuilder.Begin(),
+        # InnerTxnBuilder.SetFields(
+        #     {
+        #         TxnField.type_enum: TxnType.AssetTransfer,
+        #         TxnField.xfer_asset: App.globalGet(nft_id_key),
+        #         TxnField.asset_receiver: Txn.sender(),
+        #     }
+        # ),
+        # InnerTxnBuilder.Submit(),
+        # Approve(),
     )
 
-    # on_buy = Seq(
-    #     InnerTxnBuilder.Begin(),
-    #     InnerTxnBuilder.SetFields(
-    #         {
-    #             TxnField.type_enum: TxnType.AssetTransfer,
-    #             TxnField.xfer_asset: App.globalGet(nft_id_key),
-    #             TxnField.asset_close_to: Txn.sender(),
-    #             # TxnField.amount: Int(1),
-    #         }
-    #     ),
-    #     InnerTxnBuilder.Submit(),
-    #     Approve(),
-    # )
 
     on_call = Cond(
         [Txn.application_args[0] == Bytes("setup"), on_setup],
