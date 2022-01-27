@@ -261,7 +261,6 @@ def pay_and_call_on_buy(client: AlgodClient, application_ID: int, buyer: Account
         # price.to_bytes(8, "big")
     ]
 
-
     creator = get_creator()
     # set up the call on_buy transaction.
     call_on_buy_txn = transaction.ApplicationCallTxn(

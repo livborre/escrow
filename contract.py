@@ -73,17 +73,16 @@ def approval_program():
             App.globalGet(nft_id_key),
             App.globalGet(buyer_address_key)
         ),
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields(
+            {
+                TxnField.type_enum: TxnType.Payment,
+                TxnField.amount: App.globalGet(price_key),
+                TxnField.receiver: App.globalGet(seller_address_key),
+            }
+        ),
+        InnerTxnBuilder.Submit(),
         Approve(),
-        # InnerTxnBuilder.Begin(),
-        # InnerTxnBuilder.SetFields(
-        #     {
-        #         TxnField.type_enum: TxnType.AssetTransfer,
-        #         TxnField.xfer_asset: App.globalGet(nft_id_key),
-        #         TxnField.asset_receiver: Txn.sender(),
-        #     }
-        # ),
-        # InnerTxnBuilder.Submit(),
-        # Approve(),
     )
 
 
