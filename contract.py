@@ -62,12 +62,24 @@ def approval_program():
     #     )
 
     @Subroutine(TealType.none)
-    def close_nft_to(receiver: Expr, nft_id: Expr) -> Expr:
-        asset_holding = AssetHolding.balance(Global.current_application_address(), nft_id)
+    def close_nft_to(assetID: Expr, account: Expr) -> Expr:
+        asset_holding = AssetHolding.balance(
+            Global.current_application_address(), assetID
+        )
         return Seq(
             asset_holding,
             If(asset_holding.hasValue()).Then(
-                send_asset(receiver, nft_id)
+                Seq(
+                    InnerTxnBuilder.Begin(),
+                    InnerTxnBuilder.SetFields(
+                        {
+                            TxnField.type_enum: TxnType.AssetTransfer,
+                            TxnField.xfer_asset: assetID,
+                            TxnField.asset_close_to: account,
+                        }
+                    ),
+                    InnerTxnBuilder.Submit(),
+                )
             ),
         )
 
@@ -145,9 +157,18 @@ def approval_program():
             Gtxn[on_buy_txn_index].amount() >= App.globalGet(min_price_key)
         ).Then(
             Seq(
-                # The buy was successfull, send the nft to the buyer
-                close_nft_to(Gtxn[on_buy_txn_index].sender(), App.globalGet(nft_id_key)),
-                send_payment(App.globalGet(seller_address_key), Gtxn[on_buy_txn_index].amount()),
+                close_nft_to(App.globalGet(nft_id_key), Gtxn[on_buy_txn_index].sender()),
+
+                # Send money to seller
+                # InnerTxnBuilder.Begin(),
+                # InnerTxnBuilder.SetFields(
+                #     {
+                #         TxnField.type_enum: TxnType.Payment,
+                #         TxnField.amount: Gtxn[on_buy_txn_index].amount() - Global.min_txn_fee(),
+                #         TxnField.receiver: App.globalGet(seller_address_key),
+                #     }
+                # ),
+                # InnerTxnBuilder.Submit(),
                 Approve(),
             )
         ),

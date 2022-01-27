@@ -1,7 +1,10 @@
 from ast import Global
 from datetime import datetime, timedelta
+import encodings
 import json
+import algosdk
 from typing import Tuple, List
+from algosdk import encoding, account, mnemonic
 
 from algosdk.v2client.algod import AlgodClient
 from algosdk.future import transaction
@@ -64,11 +67,12 @@ def create_auctionApp(
     localSchema = transaction.StateSchema(num_uints=0, num_byte_slices=0)
 
     price = 1_000_000  # 1 Algo
+    nftID = get_nftid()
 
     app_args = [
-        get_seller().getAddress(),
-        get_nftid(),
-        price
+        encoding.decode_address(get_seller().getAddress()),
+        nftID.to_bytes(8, "big"),
+        price.to_bytes(8, "big")
     ]
 
     txn = transaction.ApplicationCreateTxn(
@@ -188,11 +192,11 @@ def buy_nft(client: AlgodClient, appID: int, buyer: Account) -> None:
 
     nftID = appGlobalState[b"nft_id"]
 
-    # if any(appGlobalState[b"bid_account"]):
-    #     # if "bid_account" is not the zero address
-    #     prevBidLeader = encoding.encode_address(appGlobalState[b"bid_account"])
-    # else:
-    #     prevBidLeader = None
+    if any(appGlobalState[b"seller"]):
+        # if "bid_account" is not the zero address
+        seller = encoding.encode_address(appGlobalState[b"seller"])
+    else:
+        seller = None
 
     suggestedParams = client.suggested_params()
 
@@ -211,7 +215,7 @@ def buy_nft(client: AlgodClient, appID: int, buyer: Account) -> None:
         app_args=[b"buy"],
         foreign_assets=[nftID],
         # must include the previous lead bidder here to the app can refund that bidder's payment
-        # accounts=[prevBidLeader] if prevBidLeader is not None else [],
+        accounts=[seller],
         sp=suggestedParams,
     )
 
@@ -222,7 +226,7 @@ def buy_nft(client: AlgodClient, appID: int, buyer: Account) -> None:
 
     client.send_transactions([signedPayTxn, signedAppCallTxn])
 
-    waitForTransaction(client, appCallTxn.get_txid())
+    waitForTransaction(client, signedAppCallTxn.get_txid())
 
 def do_buy_nft(application_id: int, buyer: Account):
     algod_client = get_client()
@@ -230,7 +234,10 @@ def do_buy_nft(application_id: int, buyer: Account):
 
     appGlobalState = getAppGlobalState(algod_client, application_id)
     nftID = appGlobalState[b"nft_id"]
+    address = get_application_address(application_id)
     print(f"App nft before: {nftID}")
+    print(f"App id {application_id}")
+    print(f"App address {address}")
 
     print("Buying nft...")
     print("Buyer address: {}".format(buyer.getAddress()))
@@ -247,4 +254,4 @@ def do_buy_nft(application_id: int, buyer: Account):
     print("Buyer info: {}".format(json.dumps(buyer_info_after)))
 
 # create_and_fund(get_account(), get_seller())
-do_buy_nft(67207667, get_buyer())
+do_buy_nft(67216795, get_buyer())
