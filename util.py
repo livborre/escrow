@@ -1,11 +1,18 @@
 from typing import List, Tuple, Dict, Any, Optional, Union
 from base64 import b64decode
-
 from algosdk.v2client.algod import AlgodClient
-from algosdk import encoding, account, mnemonic
-
-
+from algosdk import mnemonic
 from pyteal import compileTeal, Mode, Expr
+import os
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+
+
+
 
 from account import Account
 
@@ -120,20 +127,31 @@ def get_client():
     algod_client = AlgodClient(algod_token, algod_address)
     return algod_client
 
-def get_account():
-    private_key = "cBFLfo2zholU0RRWeyNsnmlCnTV93lQNmJV34QSWURTojVVh6LXTXW68eAU3TYd4qfMLvzHZOkieiDbcoB0eGQ=="
-    my_address = "5CGVKYPIWXJV23V4PACTOTMHPCU7GC57GHMTUSE6RA3NZIA5DYMWAMNTM4"
-    # come clump sand decide aspect carbon melt below hello mistake current okay luggage guard trust taxi pride gasp skull blast antenna grain penalty abandon script
+
+creator_pk = os.environ.get("CREATOR_PK")
+buyer_pk = os.environ.get("BUYER_PK")
+seller_pk = os.environ.get("SELLER_PK")
+
+creator_address = os.environ.get("CREATOR_ADDRESS")
+buyer_address = os.environ.get("BUYER_ADDRESS")
+seller_address = os.environ.get("SELLER_ADDRESS")
+
+def get_creator():
+    private_key = creator_pk
+    my_address = creator_address
+    # bullet cigar couple same panther ugly drill fold talk shrug sunset come love crystal evoke there hollow setup swift olympic similar trigger floor absorb argue
     return Account(private_key)
 
 def get_seller():
-    private_key = "DIWbuHIYfprqtaUD6cQkcx3Zmsj6vq557yrUtXTzbGV1K+sZe+guHeNKDvFBo1DZjGC7cKmRg3rUuooETBVqpw=="
-    my_address = "OUV6WGL35AXB3Y2KB3YUDI2Q3GGGBO3QVGIYG6WUXKFAITAVNKT7UIQYQI"
+    private_key = seller_pk
+    my_address = seller_address
+    # goose ketchup mistake void drill drastic cat pact impose swamp later pigeon gift load frozen dry enroll vague seed clinic caution nice soap abstract wire
     return Account(private_key)
 
 def get_buyer():
-    private_key = "ES5wU2wzX2W0ezQLr2mjGIM7z8QHrjz43qxyZr8HeW/IMIl+5zZ3uvtSMobJRVmGWzaPIRdehBFuaIr+WdPH7A=="
-    my_address = "ZAYIS7XHGZ33V62SGKDMSRKZQZNTNDZBC5PIIELONCFP4WOTY7WMOMHFUM"
+    private_key = buyer_pk
+    my_address = buyer_address
+    # neither surface artefact garage clutch catch kiss bacon job spread border blade later meat sound muffin hello moral razor endorse alter just sustain able shadow
     return Account(private_key)
 
 def get_nftid():
@@ -142,3 +160,8 @@ def get_nftid():
 def printState(appID: int):
     state = getAppGlobalState(get_client(), appID)
     print(state)
+
+def get_mnemonic(Account: Account):
+    private_key = Account.getPrivateKey()
+    return mnemonic.from_private_key(private_key)
+

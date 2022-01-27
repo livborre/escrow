@@ -2,3 +2,4 @@
 escrowvenv/
 escrow_venv/
 __pycache__/
+.env/
