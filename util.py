@@ -1,10 +1,7 @@
 from typing import List, Tuple, Dict, Any, Optional, Union
 from base64 import b64decode
-
 from algosdk.v2client.algod import AlgodClient
-from algosdk import encoding, account, mnemonic
-
-
+from algosdk import mnemonic
 from pyteal import compileTeal, Mode, Expr
 
 from account import Account
@@ -120,20 +117,22 @@ def get_client():
     algod_client = AlgodClient(algod_token, algod_address)
     return algod_client
 
-def get_account():
-    private_key = "cBFLfo2zholU0RRWeyNsnmlCnTV93lQNmJV34QSWURTojVVh6LXTXW68eAU3TYd4qfMLvzHZOkieiDbcoB0eGQ=="
-    my_address = "5CGVKYPIWXJV23V4PACTOTMHPCU7GC57GHMTUSE6RA3NZIA5DYMWAMNTM4"
-    # come clump sand decide aspect carbon melt below hello mistake current okay luggage guard trust taxi pride gasp skull blast antenna grain penalty abandon script
+def get_creator():
+    private_key = "KYKf2DrRMcKutz49aX66brG0m6ZE8i8RIjJoYqAwgsNB0AyhwqdD0i7Ml4rGE/NfQGBWJYbNTqv0RJooMCFokw=="
+    my_address = "IHIAZIOCU5B5ELWMS6FMME7TL5AGAVRFQ3GU5K7UISNCQMBBNCJ752VLIY"
+    # nest capital upper century peace later basket jelly choice tuna hamster letter giggle quarter bring release crunch later month rather lyrics lottery gap abstract drea
     return Account(private_key)
 
 def get_seller():
     private_key = "DIWbuHIYfprqtaUD6cQkcx3Zmsj6vq557yrUtXTzbGV1K+sZe+guHeNKDvFBo1DZjGC7cKmRg3rUuooETBVqpw=="
     my_address = "OUV6WGL35AXB3Y2KB3YUDI2Q3GGGBO3QVGIYG6WUXKFAITAVNKT7UIQYQI"
+    # pave host fox mango wire pledge quantum pizza call beauty mystery strong rate chase stone same cupboard sadness betray front truly devote clock about vapor
     return Account(private_key)
 
 def get_buyer():
     private_key = "ES5wU2wzX2W0ezQLr2mjGIM7z8QHrjz43qxyZr8HeW/IMIl+5zZ3uvtSMobJRVmGWzaPIRdehBFuaIr+WdPH7A=="
     my_address = "ZAYIS7XHGZ33V62SGKDMSRKZQZNTNDZBC5PIIELONCFP4WOTY7WMOMHFUM"
+    # season scheme claim cycle salmon bone tank crucial thumb pluck faculty cover jacket critic dilemma puppy always know filter grunt learn draft knock about shoot
     return Account(private_key)
 
 def get_nftid():
@@ -142,3 +141,8 @@ def get_nftid():
 def printState(appID: int):
     state = getAppGlobalState(get_client(), appID)
     print(state)
+
+def get_mnemonic(Account: Account):
+    private_key = Account.getPrivateKey()
+    return mnemonic.from_private_key(private_key)
+

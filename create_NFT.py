@@ -1,44 +1,45 @@
 from algosdk.future.transaction import AssetConfigTxn, wait_for_confirmation
+from account import Account
+
 from util import (
-   get_account, 
    get_client,
    get_seller,
 )
 
-def create_NFT(sender):
-    algod_client = get_client()
-    my_address = sender.getAddress()
 
-    txn = AssetConfigTxn(sender=my_address,
+def create_NFT(seller: Account):
+    """ Create NFT in the sender account. 
+    Args: 
+        Seller: A seller account.
+    
+    Returns: 
+        NFT_ID: The NFT ID.
+    """
+    algod_client = get_client()
+    seller_address = seller.getAddress()
+
+    create_NFT_txn = AssetConfigTxn(sender=seller_address,
                         sp=algod_client.suggested_params(),
                         total=1,          
                         default_frozen=False,
                         unit_name="CC",
                         asset_name="Carbon Credit: 1 Ton",
-                        manager=my_address,
-                        reserve=my_address,
-                        freeze=my_address,
-                        clawback=my_address,
+                        manager=seller_address,
+                        reserve=seller_address,
+                        freeze=seller_address,
+                        clawback=seller_address,
                         decimals=0)       
 
-    signedTxn = txn.sign(sender.getPrivateKey())
-
-    txid = algod_client.send_transaction(signedTxn)
-    print(f"txid: {txid}")
-
-    wait_for_confirmation(algod_client,txid)
+    signed_NFT_txn = create_NFT_txn.sign(seller.getPrivateKey())
+    NFT_creation_txn = algod_client.send_transaction(signed_NFT_txn)
+    print(f"NFT creation transaction ID: {NFT_creation_txn}")
+    wait_for_confirmation(algod_client, NFT_creation_txn)
 
     try:
-        # Pull account info for the creator
-        account_info = algod_client.account_info(my_address)
-        # get asset_id from tx
-        # Get the new asset's information from the creator account
-        ptx = algod_client.pending_transaction_info(txid)
-        asset_id = ptx["asset-index"]
-        print(f"asset_id: {asset_id}")
-        # asset = account_info["created-assets"][0]
-        # print(f"created asset: {asset}")
+        pending_txn= algod_client.pending_transaction_info(NFT_creation_txn)
+        NFT_ID = pending_txn["asset-index"]
+        print(f"NFT ID: {NFT_ID}")
     except Exception as e:
         print(e)
 
-create_NFT(get_seller())
+    return NFT_ID
