@@ -1,12 +1,9 @@
-import json
-
 from typing import Tuple
 from algosdk import encoding
 from algosdk.v2client.algod import AlgodClient
 from algosdk.future import transaction
 from algosdk.logic import get_application_address
 from algosdk.future.transaction import AssetTransferTxn
-
 from account import Account
 from contract import approval_program, clear_state_program
 from util import (
@@ -16,10 +13,9 @@ from util import (
     waitForTransaction,
     fullyCompileContract,
     getAppGlobalState,
-    get_client
+    get_client,
+    create_NFT
 )
-
-from create_NFT import create_NFT
 
 APPROVAL_PROGRAM = b""
 CLEAR_STATE_PROGRAM = b""
@@ -324,10 +320,8 @@ def buy_and_transfer_NFT(application_ID: int, buyer: Account):
     print("https://testnet.algoexplorer.io/address/" + f"{buyer.getAddress()}")
     print("Transfer 1 Algo from Escrow Contract to seller")
 
-    # buyer_info = algod_client.account_info(buyer.getAddress())
-    # pretty_buyer_info = json.dumps(buyer_info, indent=4)
-    # print(f"Buyer info after buying: {pretty_buyer_info}")
 
+# ==========================================================================
 # get account details.
 client = get_client()
 creator = get_creator()

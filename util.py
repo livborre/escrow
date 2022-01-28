@@ -1,20 +1,18 @@
+import os
+
 from typing import List, Tuple, Dict, Any, Optional, Union
 from base64 import b64decode
 from algosdk.v2client.algod import AlgodClient
 from algosdk import mnemonic
 from pyteal import compileTeal, Mode, Expr
-import os
+from algosdk import account, mnemonic
 from os.path import join, dirname
 from dotenv import load_dotenv
+from account import Account
+from algosdk.future.transaction import AssetConfigTxn, wait_for_confirmation
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
-
-
-
-
-
-from account import Account
 
 class PendingTxnResponse:
     def __init__(self, response: Dict[str, Any]) -> None:
@@ -127,7 +125,6 @@ def get_client():
     algod_client = AlgodClient(algod_token, algod_address)
     return algod_client
 
-
 creator_pk = os.environ.get("CREATOR_PK")
 buyer_pk = os.environ.get("BUYER_PK")
 seller_pk = os.environ.get("SELLER_PK")
@@ -154,9 +151,6 @@ def get_buyer():
     # neither surface artefact garage clutch catch kiss bacon job spread border blade later meat sound muffin hello moral razor endorse alter just sustain able shadow
     return Account(private_key)
 
-def get_nftid():
-    return 67248837
-
 def printState(appID: int):
     state = getAppGlobalState(get_client(), appID)
     print(state)
@@ -164,4 +158,47 @@ def printState(appID: int):
 def get_mnemonic(Account: Account):
     private_key = Account.getPrivateKey()
     return mnemonic.from_private_key(private_key)
+
+def generate_algorand_keypair():
+    private_key, address = account.generate_account()
+    print(f"My address: {address}")
+    print(f"My private_key: {private_key}")
+    print(f"My seed phrase: {mnemonic.from_private_key(private_key)}")
+
+def create_NFT(seller: Account):
+    """ Create NFT in the sender account. 
+    Args: 
+        Seller: A seller account.
+    
+    Returns: 
+        NFT_ID: The NFT ID.
+    """
+    algod_client = get_client()
+    seller_address = seller.getAddress()
+
+    create_NFT_txn = AssetConfigTxn(sender=seller_address,
+                        sp=algod_client.suggested_params(),
+                        total=1,          
+                        default_frozen=False,
+                        unit_name="CC",
+                        asset_name="Carbon Credit: 1 Ton",
+                        manager=seller_address,
+                        reserve=seller_address,
+                        freeze=seller_address,
+                        clawback=seller_address,
+                        decimals=0)       
+
+    signed_NFT_txn = create_NFT_txn.sign(seller.getPrivateKey())
+    NFT_creation_txn = algod_client.send_transaction(signed_NFT_txn)
+    print(f"NFT creation transaction ID: {NFT_creation_txn}")
+    wait_for_confirmation(algod_client, NFT_creation_txn)
+
+    try:
+        pending_txn= algod_client.pending_transaction_info(NFT_creation_txn)
+        NFT_ID = pending_txn["asset-index"]
+        # print(f"NFT ID: {NFT_ID}")
+    except Exception as e:
+        print(e)
+
+    return NFT_ID
 
