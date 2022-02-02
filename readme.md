@@ -12,36 +12,35 @@ Two people coded up this implementation in the space of two working days ready f
 * If you don't have Docker Desktop, install it from [here](https://www.docker.com/get-started).
 
 * Setup the sandbox (this starts an Algorand node to communicate with a local network, the testnet or the mainnet):
-```
+```bash
 git clone https://github.com/algorand/sandbox
 cd sandbox
 ./sandbox up testnet
 ```
-
-* This sandbox initial startup takes a while so wait until it's done and you have access to your terminal prompt again.
+&ensp;&ensp;&ensp;&ensp;_(This sandbox initial startup takes a while so wait until it's done and you have access to your terminal prompt again.)_
 
 * Clone this repository and move into the folder:
-```
+```bash
 git clone https://github.com/livborre/escrow
 cd escrow
 ```
 
 * Create a Python environment, install requirements and activate the environment:
-```
+```bash
 python3 -m venv escrow_venv
 pip3 install -r requirements.txt
 source escrow_venv/bin/activate
 ```
 
-* Generate Algorand accounts (creator, seller and buyer), and store the details in a local .env file:
-```
+* Generate _Algorand accounts_ (creator, seller and buyer), and store the details in a local `.env` file:
+```bash
 python generateAccounts.py
 ```
 
-(Remember to fund the testnet accounts by using their addresses [here](https://bank.testnet.algorand.network/)!!!)
+* Remember to _fund_ the testnet accounts, which can be done [here](https://bank.testnet.algorand.network/)!!!
 
-* Run the example.py file for a full example of deploying the contract, creating an NFT and trading it between the buyer and seller:
-```
+* Run the `example.py` file for a full example of _deploying_ the contract, _creating_ an NFT and _trading_ it between the buyer and seller:
+```bash
 python example.py
 ```
 
