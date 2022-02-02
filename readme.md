@@ -12,30 +12,38 @@ Two people coded up this implementation in the space of two working days ready f
 * Install Docker Desktop from [here](https://www.docker.com/get-started).
 
 * Setup the sandbox (an Algorand node to communicate with a local network, the testnet or the mainnet):
-``` git clone https://github.com/algorand/sandbox ```
-``` cd sandbox ```
-``` ./sandbox up tesnet ```
+```
+git clone https://github.com/algorand/sandbox
+cd sandbox
+./sandbox up testnet
+```
 
 * This sandbox initial startup takes a while so wait until it's done and you have access to your terminal prompt again.
 
-* Clone the code and move into the folder.
-``` git clone https://github.com/livborre/escrow ```
-``` cd escrow ```
+* Clone this repository and move into the folder:
+```
+git clone https://github.com/livborre/escrow
+cd escrow
+```
 
-* Create a python environment and install the python requirements.
-```python3 -m venv escrow_venv```
-``` pip3 install -r requirements.txt ```
+* Create a Python environment, install requirements and activate the environment:
+```
+python3 -m venv escrow_venv
+pip3 install -r requirements.txt
+source escrow_venv/bin/activate
+```
 
-* Activate the Python environment.
-``` source escrow_venv/bin/activate ```
+* Generate Algorand accounts (creator, seller and buyer), and store the details in a local .env file:
+```
+python generateAccounts.py
+```
 
-* Generate the account details to be stored in a local .env file.
-``` python generateAccounts.py ```
+(Remember to fund the testnet accounts by using their addresses [here](https://bank.testnet.algorand.network/)!!!)
 
-(Remember to fund the testnet accounts generator for creator, seller and buyer [here](https://bank.testnet.algorand.network/)!!!)
-
-* Run the example.py file.
-``` python example.py ```
+* Run the example.py file for a full example of deploying the contract, creating an NFT and trading it between the buyer and seller:
+```
+python example.py
+```
 
 ## Extras
 * We recommend using the 'Algosigner' Wallet Extension for Chrome/Brave: [here](https://chrome.google.com/webstore/detail/algosigner/kmmolakhbgdlpkjkcjkebenjheonagdm/related)
