@@ -9,7 +9,7 @@ Two people coded up this implementation in the space of two working days ready f
 
 ## For Linux/Mac/WSL:
 
-* Install Docker Desktop from [here](https://www.docker.com/get-started).
+* If you don't have Docker Desktop, install it from [here](https://www.docker.com/get-started).
 
 * Setup the sandbox (an Algorand node to communicate with a local network, the testnet or the mainnet):
 ```
