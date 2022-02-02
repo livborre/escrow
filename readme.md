@@ -21,7 +21,7 @@ cd sandbox
 
 * In another terminal, clone this repository and move into the project:
 ```bash
-cd {where you want to locate the project}
+cd <where-you-want-to-locate-the-project>
 git clone https://github.com/livborre/escrow
 cd escrow
 ```
