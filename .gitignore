@@ -1,7 +1,6 @@
 __pycache__/
-.env/
+.env
 .vscode/*
 
 # place your python environment folder name below
-escrowvenv/
 escrow_venv/
