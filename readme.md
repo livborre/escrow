@@ -26,7 +26,7 @@ git clone https://github.com/livborre/escrow
 cd escrow
 ```
 
-* Activate a new Python environment and install project requirements:
+* Activate a new Python environment and install the project requirements:
 ```bash
 python3 -m venv escrow_venv
 source escrow_venv/bin/activate
