@@ -26,11 +26,11 @@ git clone https://github.com/livborre/escrow
 cd escrow
 ```
 
-* Create a Python environment, install requirements and activate the environment:
+* Activate a new Python environment and install project requirements:
 ```bash
 python3 -m venv escrow_venv
-pip3 install -r requirements.txt
 source escrow_venv/bin/activate
+pip3 install -r requirements.txt
 ```
 
 * Generate _Algorand accounts_ (creator, seller and buyer), and store the details in a local `.env` file:
