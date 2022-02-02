@@ -17,7 +17,7 @@ git clone https://github.com/algorand/sandbox
 cd sandbox
 ./sandbox up testnet
 ```
-&ensp;&ensp;&ensp;&ensp;_(This sandbox initial startup takes a while. You can proceed with the following while you wait.)_
+&ensp;&ensp;&ensp;&ensp;_(This sandbox initial startup takes a while. You can proceed while you wait.)_
 
 * In another terminal, clone this repository and move into the project:
 ```bash
