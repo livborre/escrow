@@ -17,10 +17,11 @@ git clone https://github.com/algorand/sandbox
 cd sandbox
 ./sandbox up testnet
 ```
-&ensp;&ensp;&ensp;&ensp;_(This sandbox initial startup takes a while so wait until it's done and you have access to your terminal prompt again.)_
+&ensp;&ensp;&ensp;&ensp;_(This sandbox initial startup takes a while. Open another terminal and proceed while it starts.)_
 
 * Clone this repository and move into the folder:
 ```bash
+cd {where you want to locate the project}
 git clone https://github.com/livborre/escrow
 cd escrow
 ```
